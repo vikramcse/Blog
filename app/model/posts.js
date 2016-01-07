@@ -2,7 +2,7 @@ var database = require('./database');
 
 exports.createTable = function() {
     return database.query(`
-    	CREATE TABLE posts(
+    	CREATE TABLE IF NOT EXISTS posts(
     		id INT NOT NULL AUTO_INCREMENT,
     		title VARCHAR(255) NOT NULL,
     		body TEXT NOT NULL,
@@ -22,4 +22,18 @@ exports.add = function(params) {
 
 exports.dropTable = function() {
 	return database.query('DROP TABLE IF EXISTS posts');
+};
+
+exports.remove = function(id) {
+    return database.query('DELETE FROM posts WHERE ?', {
+        id: id
+    }).then(function(result) {
+        return result.affectedRows;
+    });
+};
+
+exports.deleteAll = function() {
+    return database.query('DELETE FROM posts').then(function() {
+        return database.query('ALTER TABLE posts AUTO_INCREMENT=1');
+    });
 };
